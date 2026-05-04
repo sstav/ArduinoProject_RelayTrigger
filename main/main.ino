@@ -1,34 +1,35 @@
 const int inputPin = A3;
 const int outputPin = A10;
 
-const unsigned long debounceDelay = 50;   // זמן סינון ריצודים במילישניות
-const unsigned long pulseTime = 3000;     // פולס של 3 שניות
+const unsigned long debounceDelay = 50;
+const unsigned long pulseTime = 3000;
 
 bool alreadyTriggered = false;
 
 void setup() {
-  pinMode(inputPin, INPUT);      // אם אין נגד חיצוני, תגיד ואשנה ל-INPUT_PULLUP
+  pinMode(inputPin, INPUT_PULLUP);
   pinMode(outputPin, OUTPUT);
 
-  digitalWrite(outputPin, LOW);
+  digitalWrite(outputPin, HIGH);
 }
 
 void loop() {
-  if (digitalRead(inputPin) == HIGH && !alreadyTriggered) {
+  bool trigger = (digitalRead(inputPin) == LOW); 
 
-    delay(debounceDelay); // המתנה קצרה נגד ריצודים
+  if (trigger && !alreadyTriggered) {
 
-    if (digitalRead(inputPin) == HIGH) {
-      digitalWrite(outputPin, HIGH);
-      delay(pulseTime);
+    delay(debounceDelay);
+
+    if (digitalRead(inputPin) == LOW) {
       digitalWrite(outputPin, LOW);
+      delay(pulseTime);
+      digitalWrite(outputPin, HIGH);
 
-      alreadyTriggered = true; // מונע טריגר חוזר כל עוד A3 נשאר HIGH
+      alreadyTriggered = true;
     }
   }
 
-  // מאפשר טריגר חדש רק אחרי שהכניסה חזרה ל-LOW
-  if (digitalRead(inputPin) == LOW) {
+  if (!trigger) {
     alreadyTriggered = false;
   }
 }
